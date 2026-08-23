@@ -4,15 +4,27 @@ from src.domain.entities import Activity
 
 class ActivityRepository(ABC):
     @abstractmethod
-    def add_activity(self, activity: Activity) -> Activity:
+    def save_config(self, key: str, value: str, user_id: int) -> None:
         pass
 
     @abstractmethod
-    def get_activities(self) -> List[Activity]:
+    def get_config(self, key: str, user_id: int) -> str:
         pass
 
     @abstractmethod
-    def delete_activity(self, activity_id: int) -> None:
+    def add_activity(self, activity: Activity, user_id: int) -> Activity:
+        pass
+
+    @abstractmethod
+    def get_activities(self, user_id: int) -> List[Activity]:
+        pass
+
+    @abstractmethod
+    def delete_activity(self, activity_id: int, user_id: int) -> None:
+        pass
+
+    @abstractmethod
+    def update_activity(self, activity: Activity, user_id: int) -> Activity:
         pass
 
 class NotificationService(ABC):
