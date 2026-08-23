@@ -1,0 +1,4 @@
+[theme]
+primaryColor = "#A9C9FF" # Azul plata lunar
+font = "serif"
+# Eliminamos los fondos fijos para permitir que Streamlit cambie entre Claro y Oscuro automáticamente
