@@ -127,7 +127,7 @@ def get_cached_theme_css_v9(url_or_b64):
         }}
         
         /* Sidebar Radio Navigation Upgrade */
-        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
+        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {{
             padding: 12px 16px;
             border-radius: 12px;
             margin-bottom: 6px;
@@ -135,21 +135,21 @@ def get_cached_theme_css_v9(url_or_b64):
             border: 1px solid transparent;
             transition: all 0.2s ease;
             cursor: pointer;
-        }
-        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {
+        }}
+        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {{
             background-color: var(--dyn-border);
             transform: translateX(4px);
-        }
+        }}
         
         /* HIDE DEFAULT RADIO CIRCLES - Bulletproof for all versions */
-        section[data-testid="stSidebar"] .stRadio div[role="radio"] { display: none !important; }
-        section[data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child { display: none !important; }
-        section[data-testid="stSidebar"] .stRadio label > div:first-child { display: none !important; }
-        section[data-testid="stSidebar"] .stRadio svg { display: none !important; }
-        section[data-testid="stSidebar"] .stRadio input[type="radio"] { display: none !important; }
-        section[data-testid="stSidebar"] .stRadio .st-c* { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio div[role="radio"] {{ display: none !important; }}
+        section[data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child {{ display: none !important; }}
+        section[data-testid="stSidebar"] .stRadio label > div:first-child {{ display: none !important; }}
+        section[data-testid="stSidebar"] .stRadio svg {{ display: none !important; }}
+        section[data-testid="stSidebar"] .stRadio input[type="radio"] {{ display: none !important; }}
+        section[data-testid="stSidebar"] .stRadio .st-c* {{ display: none !important; }}
         /* Target the specific circle in new Streamlit versions */
-        section[data-testid="stSidebar"] .stRadio label span:first-child { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio label span:first-child {{ display: none !important; }}
         /* Make navigation text bold */
         section[data-testid="stSidebar"] .stRadio p,
         section[data-testid="stSidebar"] .stRadio span {{
@@ -176,9 +176,9 @@ def get_cached_theme_css_v9(url_or_b64):
             background-color: transparent !important;
         }}
         </style>
-        <img src="data:image/jpeg;base64,{b64_str}" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 0; pointer-events: none;">
         """
     except Exception as e:
+        print("ERROR IN CSS:", e)
         return ""
 
 def apply_dynamic_theme(url_or_b64):
