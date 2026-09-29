@@ -168,7 +168,47 @@ def get_cached_theme_css_v4(b64_str):
         return ""
 
 def apply_dynamic_theme(b64_str):
-    if not b64_str: return
+    if not b64_str:
+        # Tema fallback (Dark Red Moon) si falta la imagen (ej: login)
+        fallback_css = """
+        <style>
+        :root {
+            --dyn-text: #fafafa;
+            --dyn-overlay: transparent;
+            --dyn-card: rgba(24, 24, 27, 0.4);
+            --dyn-border: rgba(220, 38, 38, 0.3);
+            --dyn-accent: #dc2626;
+            --dyn-glow: rgba(220, 38, 38, 0.4);
+        }
+        
+        .stApp, [data-testid="stAppViewContainer"] {
+            background-color: #09090b !important;
+            background-image: radial-gradient(circle at 50% -20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%) !important;
+        }
+
+        .activity-card, div[data-testid="stExpander"], div[data-testid="stForm"], [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], div[data-testid="stVerticalBlock"] > div[style*="border"] {
+            background: var(--dyn-card) !important;
+            backdrop-filter: blur(10px) !important;
+            -webkit-backdrop-filter: blur(10px) !important;
+            border: 1px solid var(--dyn-border) !important;
+            border-radius: 12px !important;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+        }
+        div[data-baseweb="input"] > div {
+            background-color: #09090b !important;
+            border-color: rgba(220,38,38,0.3) !important;
+        }
+        button[kind="primary"] {
+            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%) !important;
+            border: 1px solid #ef4444 !important;
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+            color: white !important;
+        }
+        </style>
+        """
+        st.markdown(fallback_css, unsafe_allow_html=True)
+        return
+        
     css = get_cached_theme_css_v4(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)

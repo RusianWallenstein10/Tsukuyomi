@@ -13,6 +13,9 @@ def inject_styles():
         /* Global App Style */
         .stApp { 
             background-color: #09090b; 
+            background-image: 
+                radial-gradient(circle at 50% -20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%);
             color: #fafafa; 
             font-family: 'Outfit', sans-serif;
         }
