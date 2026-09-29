@@ -27,7 +27,7 @@ def get_default_bg_b64():
     return None
 
 @st.cache_data(show_spinner=False)
-def get_cached_theme_css_v3(b64_str):
+def get_cached_theme_css_v4(b64_str):
     try:
         img_bytes = base64.b64decode(b64_str)
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
@@ -38,14 +38,14 @@ def get_cached_theme_css_v3(b64_str):
         if luminance > 128:
             text_color = "#09090b"
             overlay = "rgba(255, 255, 255, 0.15)"
-            card_bg = "rgba(255, 255, 255, 0.25)"
+            card_bg = "rgba(255, 255, 255, 0.15)"
             border = "rgba(255, 255, 255, 0.4)"
             accent = f"rgb({max(0,r-100)}, {max(0,g-100)}, {max(0,b-100)})"
             glow = f"rgba({max(0,r-100)}, {max(0,g-100)}, {max(0,b-100)}, 0.4)"
         else:
             text_color = "#ffffff"
             overlay = "rgba(9, 9, 11, 0.15)"
-            card_bg = "rgba(24, 24, 27, 0.35)"
+            card_bg = "rgba(24, 24, 27, 0.20)"
             border = "rgba(255, 255, 255, 0.10)"
             accent = f"rgb({min(255,r+100)}, {min(255,g+100)}, {min(255,b+100)})"
             glow = f"rgba({min(255,r+100)}, {min(255,g+100)}, {min(255,b+100)}, 0.4)"
@@ -62,14 +62,14 @@ def get_cached_theme_css_v3(b64_str):
         }}
         
         /* Global Background */
-        .stApp, [data-testid="stAppViewContainer"] {{
+        body, .stApp, [data-testid="stAppViewContainer"] {{
             background-image: url("data:image/jpeg;base64,{b64_str}") !important;
             background-size: cover !important;
             background-position: center !important;
             background-attachment: fixed !important;
         }}
         
-        .stApp::before, [data-testid="stAppViewContainer"]::before {{
+        body::before, .stApp::before, [data-testid="stAppViewContainer"]::before {{
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--dyn-overlay); z-index: -1;
         }}
@@ -86,8 +86,8 @@ def get_cached_theme_css_v3(b64_str):
         }}
         [data-testid="stSidebar"] > div:first-child, [data-testid="stSidebarContent"] {{
             background-color: var(--dyn-card) !important;
-            backdrop-filter: blur(25px) !important;
-            -webkit-backdrop-filter: blur(25px) !important;
+            backdrop-filter: blur(5px) !important;
+            -webkit-backdrop-filter: blur(5px) !important;
             border-right: 1px solid var(--dyn-border) !important;
         }}
         [data-testid="stSidebarHeader"] {{
@@ -102,8 +102,8 @@ def get_cached_theme_css_v3(b64_str):
         [data-testid="stVerticalBlockBorderWrapper"],
         div[data-testid="stVerticalBlock"] > div[style*="border"] {{
             background: var(--dyn-card) !important;
-            backdrop-filter: blur(25px) !important;
-            -webkit-backdrop-filter: blur(25px) !important;
+            backdrop-filter: blur(5px) !important;
+            -webkit-backdrop-filter: blur(5px) !important;
             border: 1px solid var(--dyn-border) !important;
             border-radius: 12px !important;
         }}
@@ -114,7 +114,7 @@ def get_cached_theme_css_v3(b64_str):
         }}
         
         /* Sidebar Radio Navigation Upgrade */
-        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {{
+        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label {
             padding: 12px 16px;
             border-radius: 12px;
             margin-bottom: 6px;
@@ -122,18 +122,21 @@ def get_cached_theme_css_v3(b64_str):
             border: 1px solid transparent;
             transition: all 0.2s ease;
             cursor: pointer;
-        }}
-        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {{
+        }
+        section[data-testid="stSidebar"] .stRadio > div[role="radiogroup"] > label:hover {
             background-color: var(--dyn-border);
             transform: translateX(4px);
-        }}
+        }
         
         /* HIDE DEFAULT RADIO CIRCLES - Bulletproof for all versions */
-        section[data-testid="stSidebar"] .stRadio div[role="radio"] {{ display: none !important; }}
-        section[data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child {{ display: none !important; }}
-        section[data-testid="stSidebar"] .stRadio label > div:first-child {{ display: none !important; }}
-        section[data-testid="stSidebar"] .stRadio svg {{ display: none !important; }}
-        
+        section[data-testid="stSidebar"] .stRadio div[role="radio"] { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio label > div:first-child { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio svg { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio input[type="radio"] { display: none !important; }
+        section[data-testid="stSidebar"] .stRadio .st-c* { display: none !important; }
+        /* Target the specific circle in new Streamlit versions */
+        section[data-testid="stSidebar"] .stRadio label span:first-child { display: none !important; }
         /* Make navigation text bold */
         section[data-testid="stSidebar"] .stRadio p,
         section[data-testid="stSidebar"] .stRadio span {{
@@ -166,7 +169,7 @@ def get_cached_theme_css_v3(b64_str):
 
 def apply_dynamic_theme(b64_str):
     if not b64_str: return
-    css = get_cached_theme_css_v3(b64_str)
+    css = get_cached_theme_css_v4(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)
 
