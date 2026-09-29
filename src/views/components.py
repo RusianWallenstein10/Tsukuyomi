@@ -27,7 +27,7 @@ def get_default_bg_b64():
     return None
 
 @st.cache_data(show_spinner=False)
-def get_cached_theme_css(b64_str):
+def get_cached_theme_css_v2(b64_str):
     try:
         img_bytes = base64.b64decode(b64_str)
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
@@ -99,6 +99,7 @@ def get_cached_theme_css(b64_str):
         div[data-testid="stExpander"], 
         div[data-testid="stForm"], 
         [data-testid="stMetric"], 
+        [data-testid="stVerticalBlockBorderWrapper"],
         div[data-testid="stVerticalBlock"] > div[style*="border"] {{
             background: var(--dyn-card) !important;
             backdrop-filter: blur(15px) !important;
@@ -165,7 +166,7 @@ def get_cached_theme_css(b64_str):
 
 def apply_dynamic_theme(b64_str):
     if not b64_str: return
-    css = get_cached_theme_css(b64_str)
+    css = get_cached_theme_css_v2(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)
 
