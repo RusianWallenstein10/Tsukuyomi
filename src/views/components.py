@@ -189,7 +189,9 @@ def apply_dynamic_theme(b64_str):
             background-size: cover !important;
         }
 
-        .activity-card, div[data-testid="stExpander"], div[data-testid="stForm"], [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], div[data-testid="stVerticalBlock"] > div[style*="border"] {
+        
+        [data-testid="column"]:nth-of-type(2) > div,
+.activity-card, div[data-testid="stExpander"], div[data-testid="stForm"], [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], div[data-testid="stVerticalBlock"] > div[style*="border"] {
             background: var(--dyn-card) !important;
             backdrop-filter: blur(15px) !important;
             -webkit-backdrop-filter: blur(15px) !important;
@@ -251,6 +253,7 @@ def login_register_view(repo):
     col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
         with st.container(border=True):
+            st.markdown('<div class="login-marker"></div>', unsafe_allow_html=True)
             tab1, tab2 = st.tabs(["👁️ Despertar", "⛩️ Forjar Alma"])
             with tab1:
                 l_user = st.text_input("Usuario", key="l_user")
