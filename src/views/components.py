@@ -60,28 +60,31 @@ def get_cached_theme_css(b64_str):
             --dyn-accent: {accent};
             --dyn-glow: {glow};
         }}
-        .stApp {{
+        
+        /* Global Background */
+        .stApp, [data-testid="stAppViewContainer"] {{
             background-image: url("data:image/jpeg;base64,{b64_str}") !important;
             background-size: cover !important;
             background-position: center !important;
             background-attachment: fixed !important;
         }}
-        .stApp::before {{
+        
+        .stApp::before, [data-testid="stAppViewContainer"]::before {{
             content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--dyn-overlay); z-index: -1;
         }}
         
         /* Typography */
-        .stApp, .stMarkdown p, h1, h2, h3, h4, h5, h6, label p, .stMetric label {{
+        .stApp, .stMarkdown p, .stMarkdown span, h1, h2, h3, h4, h5, h6, label p, label span, .stMetric label {{
             color: var(--dyn-text) !important;
             text-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }}
         
-        /* Sidebar Glassmorphism Fix */
+        /* Sidebar Glassmorphism Fix for Newer Streamlit */
         [data-testid="stSidebar"] {{
             background-color: transparent !important;
         }}
-        [data-testid="stSidebar"] > div:first-child {{
+        [data-testid="stSidebar"] > div:first-child, [data-testid="stSidebarContent"] {{
             background-color: var(--dyn-card) !important;
             backdrop-filter: blur(15px) !important;
             -webkit-backdrop-filter: blur(15px) !important;
@@ -91,12 +94,22 @@ def get_cached_theme_css(b64_str):
             background-color: transparent !important;
         }}
 
-        /* Glassmorphism Cards */
-        .activity-card, div[data-testid="stExpander"], div[data-testid="stForm"], div[data-testid="stVerticalBlock"] > div[style*="border"] {{
+        /* Glassmorphism Cards & Metrics */
+        .activity-card, 
+        div[data-testid="stExpander"], 
+        div[data-testid="stForm"], 
+        [data-testid="stMetric"], 
+        div[data-testid="stVerticalBlock"] > div[style*="border"] {{
             background: var(--dyn-card) !important;
             backdrop-filter: blur(15px) !important;
             -webkit-backdrop-filter: blur(15px) !important;
-            border-color: var(--dyn-border) !important;
+            border: 1px solid var(--dyn-border) !important;
+            border-radius: 12px !important;
+        }}
+        
+        /* Add padding specifically to metrics so they look like cards */
+        [data-testid="stMetric"] {{
+            padding: 15px !important;
         }}
         
         /* Sidebar Radio Navigation Upgrade */
@@ -114,13 +127,15 @@ def get_cached_theme_css(b64_str):
             transform: translateX(4px);
         }}
         
-        /* HIDE DEFAULT RADIO CIRCLES */
+        /* HIDE DEFAULT RADIO CIRCLES - Bulletproof for all versions */
         section[data-testid="stSidebar"] .stRadio div[role="radio"] {{ display: none !important; }}
         section[data-testid="stSidebar"] .stRadio [data-baseweb="radio"] > div:first-child {{ display: none !important; }}
         section[data-testid="stSidebar"] .stRadio label > div:first-child {{ display: none !important; }}
+        section[data-testid="stSidebar"] .stRadio svg {{ display: none !important; }}
         
         /* Make navigation text bold */
-        section[data-testid="stSidebar"] .stRadio p {{
+        section[data-testid="stSidebar"] .stRadio p,
+        section[data-testid="stSidebar"] .stRadio span {{
             font-size: 1.05rem !important;
             font-weight: 600 !important;
             margin: 0 !important;
