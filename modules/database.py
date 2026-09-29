@@ -7,6 +7,7 @@ if not os.path.exists('data'):
 
 DB_PATH = "data/tsukuyomi.db"
 
+
 def init_db():
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -24,6 +25,7 @@ def init_db():
     conn.commit()
     conn.close()
 
+
 def agregar_actividad(actividad, fase, inicio, fin, categoria):
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
@@ -32,11 +34,13 @@ def agregar_actividad(actividad, fase, inicio, fin, categoria):
     conn.commit()
     conn.close()
 
+
 def obtener_datos():
     conn = sqlite3.connect(DB_PATH)
     df = pd.read_sql_query("SELECT * FROM horarios", conn)
     conn.close()
     return df
+
 
 def borrar_dato(id_tarea):
     conn = sqlite3.connect(DB_PATH)

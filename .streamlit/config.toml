@@ -1,7 +1,0 @@
-[theme]
-base = "dark"
-primaryColor = "#A9C9FF" # Azul plata lunar
-backgroundColor = "#0e1117"
-secondaryBackgroundColor = "#262730"
-textColor = "#fafafa"
-font = "serif"

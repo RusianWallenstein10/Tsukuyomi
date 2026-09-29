@@ -1,77 +1,82 @@
 # 🌙 Tsukuyomi Master System
 
-![Tsukuyomi](https://img.shields.io/badge/Status-Active-brightgreen.svg)
-![Python](https://img.shields.io/badge/Python-3.x-blue.svg)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-FF4B4B.svg)
-![Clean Architecture](https://img.shields.io/badge/Architecture-Clean-orange.svg)
+**Tsukuyomi Master System** es una aplicación integral de productividad personal, gestión de tiempo y alineación vital diseñada con una estética inmersiva (inspirada en la estética anime japonesa y el *Glassmorphism*). 
 
-Tsukuyomi es una aplicación web diseñada para la **Sincronización Multidía de Actividades**. Actúa como un santuario personal y planificador de "rituales" (tareas, universidad, deportes, etc.) permitiendo organizar rutinas semanales de manera visual y estructurada.
+Está construida 100% en Python utilizando **Streamlit** y conectada a **Supabase** (PostgreSQL) como base de datos, implementando una arquitectura **MVC** (Modelo-Vista-Controlador) limpia y escalable.
+
+---
 
 ## ✨ Características Principales
 
-*   **Sincronización Multidía:** Programa una misma actividad para múltiples días de la semana de una sola vez.
-*   **Visualización Intuitiva:** Interfaz organizada por pestañas para cada día de la semana, con tarjetas de colores basadas en categorías.
-*   **Seguridad:** Acceso protegido mediante contraseña maestra.
-*   **Almacenamiento Cloud-Native:** Todos los datos se guardan directamente en tu propia base de datos **Supabase** (PostgreSQL) en la nube.
-*   **Balance de Energías:** Gráfico analítico para visualizar en qué categorías inviertes más tu tiempo.
-*   **Notificaciones:** Integración con servicios de Telegram para recordatorios (infraestructura lista).
-
-## 🏗️ Arquitectura
-
-El proyecto está diseñado bajo los principios de **Clean Architecture**, dividiendo las responsabilidades en capas claras para favorecer la escalabilidad y el testing:
-
-```text
-src/
-├── domain/           # Entidades centrales y puertos (Interfaces)
-├── application/      # Casos de uso (Lógica de negocio)
-└── infrastructure/   # Implementaciones concretas (Adapters de BD, APIs externas)
-```
-
-## 🚀 Instalación y Uso Local
-
-Sigue estos pasos para ejecutar el proyecto en tu entorno local:
-
-1. **Clonar el repositorio** (si aplica) o ubicarse en la carpeta del proyecto.
-2. **Crear un entorno virtual** (Opcional pero recomendado):
-   ```bash
-   python -m venv venv
-   source venv/bin/activate  # En Linux/Mac
-   venv\Scripts\activate     # En Windows
-   ```
-3. **Instalar dependencias:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. **Configurar variables de entorno:**
-   Copia el archivo `.env.example` a `.env` y configura tus variables:
-   ```env
-   APP_PASSWORD=tu_contraseña_maestra
-   
-   # Conexión a tu Supabase:
-   SUPABASE_URL=tu_supabase_url
-   SUPABASE_KEY=tu_supabase_key
-   
-   # Para notificaciones de Telegram:
-   TELEGRAM_BOT_TOKEN=tu_token
-   TELEGRAM_CHAT_ID=tu_chat_id
-   ```
-5. **Ejecutar la aplicación:**
-   ```bash
-   streamlit run app.py
-   ```
-
-## 🛠️ Tecnologías Utilizadas
-
-*   **Frontend & Web Framework:** [Streamlit](https://streamlit.io/)
-*   **Backend:** Python
-*   **Bases de Datos:** Supabase (PostgreSQL en la Nube)
-*   **Calidad de Código & CI/CD:** GitHub Actions, SonarCloud, Snyk
+*   📊 **Dashboard de Alineación:** Resumen general de tus métricas, proyectos en foco (WIP) y progreso de alineación vital.
+*   🎯 **Visión & Objetivos (Ikigai):** Define tus áreas de vida, visión a largo plazo y objetivos estratégicos.
+*   📋 **Proyectos (Kanban):** Gestión de proyectos con filosofía Lean/5S. Incluye un límite de Trabajo en Progreso (WIP) para evitar la sobrecarga.
+*   🔁 **Hábitos (Shūkan):** Registro diario de hábitos vinculados a tus objetivos para mantener la consistencia.
+*   🏋️ **Deporte (Rutinas):** Planificador de rutinas de entrenamiento con pestañas interactivas para registrar series, repeticiones y peso.
+*   📝 **Notas (Pizarrón):** Sistema interactivo de *sticky notes* (post-its) con físicas y colores personalizables.
+*   🧘‍♂️ **Hansei (Reflexión):** Módulo de retrospectiva para escribir tus reflexiones y aplicar mejora continua (Kaizen).
+*   📅 **Calendario (Bloques de Tiempo):** Organiza tus actividades diarias y rutinas por franjas horarias.
+*   🤖 **Notificaciones Automáticas por Telegram:** Un *daemon* en segundo plano vigila tu calendario y te envía alertas directamente a Telegram **20 minutos antes** y **a la hora exacta** en que comienzan tus actividades.
+*   🎨 **Motor de Temado Dinámico (Dynamic Theming):** Puedes subir cualquier imagen de fondo (JPG/PNG). El sistema la procesa, extrae su color dominante y luminancia matemática, y **reescribe el CSS en tiempo real** para crear un tema translúcido (*True Glassmorphism*) que se adapta perfectamente a fotos claras u oscuras.
 
 ---
-*«Organiza tus ciclos, domina tu tiempo.»*
 
-## ©️ Derechos de Autor / Copyright
+## 🛠️ Stack Tecnológico
 
-**© 2026 Fabrizio Salvador Elias Perez Peralta.** Todos los derechos reservados.
+*   **Frontend & Interfaz:** [Streamlit](https://streamlit.io/)
+*   **Base de Datos & Almacenamiento:** [Supabase](https://supabase.com/)
+*   **Procesamiento de Imagen:** Pillow (PIL)
+*   **Notificaciones:** Telegram Bot API
+*   **Arquitectura:** Patrón MVC (Models, Views, Controllers) en Python puro.
 
-Queda estrictamente prohibida la copia, reproducción, distribución, modificación o uso de este código fuente y aplicación sin el consentimiento previo y explícito del autor. Este proyecto es de uso privado y propiedad exclusiva de su creador.
+---
+
+## 🚀 Instalación y Despliegue Local
+
+### 1. Clonar y Preparar el Entorno
+Asegúrate de tener Python 3.9 o superior instalado.
+```bash
+git clone <tu-repositorio>
+cd Tsukuyomi
+pip install -r requirements.txt
+```
+
+### 2. Configurar Variables de Entorno
+Crea un archivo `.env` en la raíz del proyecto y añade tus tokens y claves de acceso:
+```env
+SUPABASE_URL="https://<tu-id>.supabase.co"
+SUPABASE_KEY="tu-anon-key"
+TELEGRAM_BOT_TOKEN="tu-token-del-bot-creado-en-botfather"
+TELEGRAM_CHAT_ID="tu-id-de-chat-de-telegram"
+```
+
+### 3. Base de Datos
+El proyecto incluye un archivo `supabase_schema.sql` con todas las tablas relacionales necesarias (`activities`, `areas`, `objectives`, `projects`, `tasks`, `habits`, `habit_logs`, `reflections`, `app_config`). Ejecuta este script SQL directamente en el SQL Editor de tu panel de Supabase.
+
+### 4. Ejecutar la Aplicación
+```bash
+streamlit run app.py
+```
+> **Nota:** La primera vez que se ejecuta, el sistema activará automáticamente el hilo en segundo plano que gestiona los recordatorios de Telegram.
+
+---
+
+## ☁️ Despliegue en Streamlit Community Cloud
+
+Este proyecto está optimizado para ser desplegado gratuitamente en Streamlit Community Cloud:
+
+1. Conecta tu repositorio de GitHub a [share.streamlit.io](https://share.streamlit.io/).
+2. Configura como archivo principal: `app.py`.
+3. En la sección **Advanced Settings > Secrets**, pega tus claves en formato TOML:
+   ```toml
+   SUPABASE_URL = "https://..."
+   SUPABASE_KEY = "eyJh..."
+   TELEGRAM_BOT_TOKEN = "..."
+   TELEGRAM_CHAT_ID = "..."
+   ```
+4. Despliega la aplicación. 
+
+*(Recordatorio: En cuentas gratuitas de Streamlit Cloud, la app "se duerme" si no recibe tráfico. Para que el bot de notificaciones siga activo 24/7, utiliza un servicio gratuito de ping como cron-job.org para hacer solicitudes HTTP y mantener la app despierta).*
+
+---
+*Desarrollado para mantener la disciplina, la alineación y el enfoque absoluto.* 🌙
