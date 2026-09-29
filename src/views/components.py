@@ -18,7 +18,17 @@ from PIL import Image
 import io
 
 def get_default_bg_b64():
+    import os
+    import base64
     try:
+        # 1. Intentar ruta absoluta (a prueba de fallos en Streamlit Cloud)
+        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        bg_path = os.path.join(base_dir, "assets", "default_bg.jpg")
+        if os.path.exists(bg_path):
+            with open(bg_path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+                
+        # 2. Intentar ruta relativa
         if os.path.exists("assets/default_bg.jpg"):
             with open("assets/default_bg.jpg", "rb") as f:
                 return base64.b64encode(f.read()).decode()
@@ -27,7 +37,7 @@ def get_default_bg_b64():
     return None
 
 @st.cache_data(show_spinner=False)
-def get_cached_theme_css_v4(b64_str):
+def get_cached_theme_css_v5(b64_str):
     try:
         img_bytes = base64.b64decode(b64_str)
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
@@ -232,7 +242,7 @@ def apply_dynamic_theme(b64_str):
         st.markdown(fallback_css, unsafe_allow_html=True)
         return
         
-    css = get_cached_theme_css_v4(b64_str)
+    css = get_cached_theme_css_v5(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)
 
