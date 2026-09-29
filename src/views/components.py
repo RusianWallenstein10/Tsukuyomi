@@ -71,6 +71,28 @@ def get_cached_theme_css_v8(b64_str):
             --dyn-glow: {glow};
         }}
         
+        /* Bypass for DOMPurify using Native Streamlit Image */
+        div[data-testid="stVerticalBlock"]:has(.bg-native-hook) {
+            position: absolute !important;
+            width: 0px !important;
+            height: 0px !important;
+            overflow: visible !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+        div[data-testid="stVerticalBlock"]:has(.bg-native-hook) img {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100vw !important;
+            height: 100vh !important;
+            object-fit: cover !important;
+            z-index: 0 !important;
+            pointer-events: none !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
         /* Global Background */
         body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
             background-color: transparent !important;
@@ -257,6 +279,16 @@ def apply_dynamic_theme(b64_str):
     css = get_cached_theme_css_v8(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)
+        # NATIVE IMAGE BYPASS: Si Streamlit Cloud bloquea base64, inyectamos la imagen como un widget nativo
+        # y usamos CSS para mandarlo al fondo.
+        import base64
+        try:
+            img_bytes = base64.b64decode(b64_str)
+            with st.container():
+                st.markdown('<div class="bg-native-hook"></div>', unsafe_allow_html=True)
+                st.image(img_bytes)
+        except Exception:
+            pass
 
 def login_register_view(repo):
     apply_dynamic_theme(get_default_bg_b64())
