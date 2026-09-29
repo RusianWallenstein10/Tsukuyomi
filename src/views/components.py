@@ -27,7 +27,7 @@ def get_default_bg_b64():
     return None
 
 @st.cache_data(show_spinner=False)
-def get_cached_theme_css_v2(b64_str):
+def get_cached_theme_css_v3(b64_str):
     try:
         img_bytes = base64.b64decode(b64_str)
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
@@ -37,16 +37,16 @@ def get_cached_theme_css_v2(b64_str):
         
         if luminance > 128:
             text_color = "#09090b"
-            overlay = "rgba(255, 255, 255, 0.40)"
-            card_bg = "rgba(255, 255, 255, 0.45)"
-            border = "rgba(0, 0, 0, 0.15)"
+            overlay = "rgba(255, 255, 255, 0.15)"
+            card_bg = "rgba(255, 255, 255, 0.25)"
+            border = "rgba(255, 255, 255, 0.4)"
             accent = f"rgb({max(0,r-100)}, {max(0,g-100)}, {max(0,b-100)})"
             glow = f"rgba({max(0,r-100)}, {max(0,g-100)}, {max(0,b-100)}, 0.4)"
         else:
             text_color = "#ffffff"
-            overlay = "rgba(9, 9, 11, 0.50)"
-            card_bg = "rgba(24, 24, 27, 0.55)"
-            border = "rgba(255, 255, 255, 0.15)"
+            overlay = "rgba(9, 9, 11, 0.15)"
+            card_bg = "rgba(24, 24, 27, 0.35)"
+            border = "rgba(255, 255, 255, 0.10)"
             accent = f"rgb({min(255,r+100)}, {min(255,g+100)}, {min(255,b+100)})"
             glow = f"rgba({min(255,r+100)}, {min(255,g+100)}, {min(255,b+100)}, 0.4)"
             
@@ -86,8 +86,8 @@ def get_cached_theme_css_v2(b64_str):
         }}
         [data-testid="stSidebar"] > div:first-child, [data-testid="stSidebarContent"] {{
             background-color: var(--dyn-card) !important;
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
             border-right: 1px solid var(--dyn-border) !important;
         }}
         [data-testid="stSidebarHeader"] {{
@@ -102,8 +102,8 @@ def get_cached_theme_css_v2(b64_str):
         [data-testid="stVerticalBlockBorderWrapper"],
         div[data-testid="stVerticalBlock"] > div[style*="border"] {{
             background: var(--dyn-card) !important;
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
+            backdrop-filter: blur(25px) !important;
+            -webkit-backdrop-filter: blur(25px) !important;
             border: 1px solid var(--dyn-border) !important;
             border-radius: 12px !important;
         }}
@@ -166,7 +166,7 @@ def get_cached_theme_css_v2(b64_str):
 
 def apply_dynamic_theme(b64_str):
     if not b64_str: return
-    css = get_cached_theme_css_v2(b64_str)
+    css = get_cached_theme_css_v3(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)
 
