@@ -173,39 +173,60 @@ def apply_dynamic_theme(b64_str):
         fallback_css = """
         <style>
         :root {
-            --dyn-text: #fafafa;
+            --dyn-text: #ffffff;
             --dyn-overlay: transparent;
-            --dyn-card: rgba(24, 24, 27, 0.4);
-            --dyn-border: rgba(220, 38, 38, 0.3);
-            --dyn-accent: #dc2626;
-            --dyn-glow: rgba(220, 38, 38, 0.4);
+            --dyn-card: rgba(40, 10, 10, 0.7);
+            --dyn-border: rgba(220, 38, 38, 0.8);
+            --dyn-accent: #ff3333;
+            --dyn-glow: rgba(255, 50, 50, 0.6);
         }
         
-        .stApp, [data-testid="stAppViewContainer"] {
-            background-color: #09090b !important;
-            background-image: radial-gradient(circle at 50% -20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.08) 0%, transparent 40%) !important;
+        body, .stApp, [data-testid="stAppViewContainer"] {
+            background-color: #050000 !important;
+            background-image: 
+                radial-gradient(circle at 50% 20%, rgba(220, 20, 20, 0.4) 0%, transparent 40%), 
+                radial-gradient(circle at 50% 100%, rgba(139, 0, 0, 0.3) 0%, transparent 60%) !important;
+            background-size: cover !important;
         }
 
         .activity-card, div[data-testid="stExpander"], div[data-testid="stForm"], [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], div[data-testid="stVerticalBlock"] > div[style*="border"] {
             background: var(--dyn-card) !important;
-            backdrop-filter: blur(10px) !important;
-            -webkit-backdrop-filter: blur(10px) !important;
+            backdrop-filter: blur(15px) !important;
+            -webkit-backdrop-filter: blur(15px) !important;
             border: 1px solid var(--dyn-border) !important;
-            border-radius: 12px !important;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5) !important;
+            border-radius: 16px !important;
+            box-shadow: 0 0 30px rgba(220, 38, 38, 0.4), inset 0 0 20px rgba(220, 38, 38, 0.1) !important;
         }
         div[data-baseweb="input"] > div {
-            background-color: #09090b !important;
-            border-color: rgba(220,38,38,0.3) !important;
+            background-color: rgba(0,0,0,0.6) !important;
+            border: 1px solid rgba(220,38,38,0.5) !important;
+        }
+        div[data-baseweb="input"] > div:focus-within {
+            border-color: #ff3333 !important;
+            box-shadow: 0 0 15px rgba(255, 50, 50, 0.5) !important;
         }
         button[kind="primary"] {
-            background: linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%) !important;
-            border: 1px solid #ef4444 !important;
-            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3) !important;
+            background: linear-gradient(135deg, #dc2626 0%, #7f1d1d 100%) !important;
+            border: 1px solid #ff6666 !important;
+            box-shadow: 0 4px 20px rgba(220, 38, 38, 0.6) !important;
             color: white !important;
+            font-weight: bold !important;
+            letter-spacing: 2px !important;
+        }
+        button[kind="primary"]:hover {
+            box-shadow: 0 4px 30px rgba(255, 50, 50, 0.8) !important;
+            transform: translateY(-2px);
+        }
+        /* Make tabs look good too */
+        button[data-baseweb="tab"] {
+            color: #d4d4d8 !important;
+        }
+        button[data-baseweb="tab"][aria-selected="true"] {
+            color: #ff3333 !important;
+            border-bottom: 2px solid #ff3333 !important;
         }
         </style>
-        """
+"""
         st.markdown(fallback_css, unsafe_allow_html=True)
         return
         
