@@ -37,7 +37,7 @@ def get_default_bg_b64():
     return None
 
 @st.cache_data(show_spinner=False)
-def get_cached_theme_css_v6(b64_str):
+def get_cached_theme_css_v8(b64_str):
     try:
         img_bytes = base64.b64decode(b64_str)
         img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
@@ -78,6 +78,16 @@ def get_cached_theme_css_v6(b64_str):
         }}
         .main {{
             background-color: transparent !important;
+            position: relative;
+            z-index: 10;
+        }}
+        [data-testid="stSidebar"] {{
+            position: relative;
+            z-index: 10;
+        }}
+        [data-testid="stHeader"] {{
+            position: relative;
+            z-index: 10;
         }}
         
         body::before, .stApp::before, [data-testid="stAppViewContainer"]::before {{
@@ -174,7 +184,7 @@ def get_cached_theme_css_v6(b64_str):
             background-color: transparent !important;
         }}
         </style>
-        <img src="data:image/jpeg;base64,{b64_str}" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: -9999; pointer-events: none;">
+        <img src="data:image/jpeg;base64,{b64_str}" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 0; pointer-events: none;">
         """
     except Exception as e:
         return ""
@@ -244,7 +254,7 @@ def apply_dynamic_theme(b64_str):
         st.markdown(fallback_css, unsafe_allow_html=True)
         return
         
-    css = get_cached_theme_css_v6(b64_str)
+    css = get_cached_theme_css_v8(b64_str)
     if css:
         st.markdown(css, unsafe_allow_html=True)
 
