@@ -18,29 +18,21 @@ from PIL import Image
 import io
 
 def get_default_bg_b64():
-    import os
-    import base64
-    try:
-        # 1. Intentar ruta absoluta (a prueba de fallos en Streamlit Cloud)
-        base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        bg_path = os.path.join(base_dir, "assets", "default_bg.jpg")
-        if os.path.exists(bg_path):
-            with open(bg_path, "rb") as f:
-                return base64.b64encode(f.read()).decode()
-                
-        # 2. Intentar ruta relativa
-        if os.path.exists("assets/default_bg.jpg"):
-            with open("assets/default_bg.jpg", "rb") as f:
-                return base64.b64encode(f.read()).decode()
-    except Exception:
-        pass
-    return None
+    return "https://cjcqzxzcixlkpmbwpcet.supabase.co/storage/v1/object/public/tsukuyomi_assets/default_bg.jpg"
 
 @st.cache_data(show_spinner=False)
-def get_cached_theme_css_v8(b64_str):
+def get_cached_theme_css_v9(url_or_b64):
+    import requests
     try:
-        img_bytes = base64.b64decode(b64_str)
-        img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+        if url_or_b64.startswith("http"):
+            response = requests.get(url_or_b64)
+            img = Image.open(io.BytesIO(response.content)).convert("RGB")
+            bg_css_val = f'url("{url_or_b64}")'
+        else:
+            img_bytes = base64.b64decode(url_or_b64)
+            img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+            bg_css_val = f'url("data:image/jpeg;base64,{url_or_b64}")'
+
         img = img.resize((1, 1))
         r, g, b = img.getpixel((0, 0))
         luminance = (0.299 * r + 0.587 * g + 0.114 * b)
@@ -71,28 +63,6 @@ def get_cached_theme_css_v8(b64_str):
             --dyn-glow: {glow};
         }}
         
-        /* Bypass for DOMPurify using Native Streamlit Image */
-        div[data-testid="stVerticalBlock"]:has(.bg-native-hook) {
-            position: absolute !important;
-            width: 0px !important;
-            height: 0px !important;
-            overflow: visible !important;
-            margin: 0 !important;
-            padding: 0 !important;
-        }
-        div[data-testid="stVerticalBlock"]:has(.bg-native-hook) img {
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            object-fit: cover !important;
-            z-index: 0 !important;
-            pointer-events: none !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-
         /* Global Background */
         body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
             background-color: transparent !important;
@@ -211,8 +181,8 @@ def get_cached_theme_css_v8(b64_str):
     except Exception as e:
         return ""
 
-def apply_dynamic_theme(b64_str):
-    if not b64_str:
+def apply_dynamic_theme(url_or_b64):
+    if not url_or_b64:
         # Tema fallback (Dark Red Moon) si falta la imagen (ej: login)
         fallback_css = """
         <style>
@@ -276,19 +246,10 @@ def apply_dynamic_theme(b64_str):
         st.markdown(fallback_css, unsafe_allow_html=True)
         return
         
-    css = get_cached_theme_css_v8(b64_str)
+    css = get_cached_theme_css_v9(url_or_b64)
     if css:
         st.markdown(css, unsafe_allow_html=True)
-        # NATIVE IMAGE BYPASS: Si Streamlit Cloud bloquea base64, inyectamos la imagen como un widget nativo
-        # y usamos CSS para mandarlo al fondo.
-        import base64
-        try:
-            img_bytes = base64.b64decode(b64_str)
-            with st.container():
-                st.markdown('<div class="bg-native-hook"></div>', unsafe_allow_html=True)
-                st.image(img_bytes)
-        except Exception:
-            pass
+        
 
 def login_register_view(repo):
     apply_dynamic_theme(get_default_bg_b64())
@@ -927,15 +888,27 @@ def main_app_view(use_cases):
         try:
             # Optimize image
             img = Image.open(uploaded_bg).convert("RGB")
-            # Downscale if massive to prevent base64 browser lag
             img.thumbnail((2560, 1440), Image.Resampling.LANCZOS)
             
             buffer = io.BytesIO()
             img.save(buffer, format="JPEG", quality=92)
-            base64_str = base64.b64encode(buffer.getvalue()).decode()
             
-            st.session_state.bg_image = base64_str
-            use_cases.repository.save_config("background_image", base64_str, st.session_state.user_id)
+            # Upload to Supabase Storage
+            file_name = f"{st.session_state.user_id}_bg.jpg"
+            try:
+                use_cases.repository.supabase.storage.from_("tsukuyomi_assets").remove([file_name])
+            except Exception:
+                pass
+                
+            use_cases.repository.supabase.storage.from_("tsukuyomi_assets").upload(file_name, buffer.getvalue())
+            
+            url = use_cases.repository.supabase.storage.from_("tsukuyomi_assets").get_public_url(file_name)
+            
+            import time
+            url_with_cache = f"{url}?t={int(time.time())}"
+            
+            st.session_state.bg_image = url_with_cache
+            use_cases.repository.save_config("background_image", url_with_cache, st.session_state.user_id)
             st.rerun()
         except Exception as e:
             st.error(f"Error procesando imagen: {e}")
