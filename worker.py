@@ -113,7 +113,9 @@ def main():
                 last_schedule_check = current_time
                 res = repo.supabase.table("horarios").select("*").eq("is_deleted", False).execute()
                 activities = res.data if hasattr(res, 'data') else []
-                now = datetime.now()
+                # Render usa UTC (Londres) por defecto. Ajustamos a UTC-5 (Perú/Colombia/Ecuador/México)
+                from datetime import timedelta
+                now = datetime.utcnow() - timedelta(hours=5)
                 
                 # Cache user chat_ids so we don't query the DB 100 times if not needed
                 user_chats = {}
