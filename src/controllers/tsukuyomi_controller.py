@@ -9,6 +9,12 @@ class TsukuyomiUseCases:
         self.repository = repository
         self.notifier = notifier
 
+    def _notify(self, user_id: int, message: str):
+        if self.notifier:
+            chat_id = self.repository.get_telegram_chat_id(user_id)
+            if chat_id:
+                self.notifier.send_notification(message, chat_id)
+
     # --- GAMIFICATION (EXP) ---
     def add_exp(self, user_id: int, points: int, reason: str) -> dict:
         current_exp_str = self.repository.get_config("user_exp", user_id)
@@ -20,8 +26,8 @@ class TsukuyomiUseCases:
         
         self.repository.save_config("user_exp", str(new_exp), user_id)
         
-        if new_level > old_level and self.notifier:
-            self.notifier.send_notification(f"🌟 ¡LEVEL UP! Tu constancia ha dado frutos. Ahora eres Nivel {new_level}.")
+        if new_level > old_level:
+            self._notify(user_id, f"🌟 ¡LEVEL UP! Tu constancia ha dado frutos. Ahora eres Nivel {new_level}.")
             
         return {"old_level": old_level, "new_level": new_level, "exp": new_exp}
 
@@ -40,12 +46,11 @@ class TsukuyomiUseCases:
                             inicio=inicio, fin=fin, categoria=categoria, task_id=task_id, habit_id=habit_id)
         saved_activity = self.repository.add_activity(activity, user_id)
 
-        if self.notifier:
-            msg = (
-                f"Nueva actividad creada: {actividad} "
-                f"para el {fase} a las {inicio}."
-            )
-            self.notifier.send_notification(msg)
+        msg = (
+            f"Nueva actividad creada: {actividad} "
+            f"para el {fase} a las {inicio}."
+        )
+        self._notify(user_id, msg)
 
         return saved_activity
 
@@ -54,9 +59,7 @@ class TsukuyomiUseCases:
 
     def delete_activity(self, activity_id: int, user_id: int) -> None:
         self.repository.delete_activity(activity_id, user_id)
-        if self.notifier:
-            self.notifier.send_notification(
-                f"Actividad eliminada (ID: {activity_id}).")
+        self._notify(user_id, f"Actividad eliminada (ID: {activity_id}).")
 
     def update_activity(
             self,
@@ -75,12 +78,11 @@ class TsukuyomiUseCases:
             fin=fin,
             categoria=categoria)
         updated_act = self.repository.update_activity(activity, user_id)
-        if self.notifier:
-            msg = (
-                f"🔄 Se ha actualizado el ritual "
-                f"'{actividad}' en el Tsukuyomi."
-            )
-            self.notifier.send_notification(msg)
+        msg = (
+            f"🔄 Se ha actualizado el ritual "
+            f"'{actividad}' en el Tsukuyomi."
+        )
+        self._notify(user_id, msg)
         return updated_act
 
     # --- AREA (IKIGAI) ---
@@ -114,8 +116,7 @@ class TsukuyomiUseCases:
             wip_count = sum(1 for p in projs if p.estado == "En progreso")
             if wip_count >= 3:
                 msg_err = "⚠️ Límite WIP Excedido: Ya tienes 3 proyectos en progreso. Aplica 5S y termina uno antes de comenzar otro."
-                if self.notifier:
-                    self.notifier.send_notification(msg_err)
+                self._notify(user_id, msg_err)
                 raise ValueError(msg_err)
         
         projs = self.repository.get_projects(user_id)
@@ -125,8 +126,8 @@ class TsukuyomiUseCases:
         proj.estado = nuevo_estado
         res = self.repository.update_project(proj, user_id)
         
-        if self.notifier and nuevo_estado == "Completado":
-            self.notifier.send_notification(f"🏆 ¡Proyecto Completado! Has finalizado el proyecto: {proj.nombre}")
+        if nuevo_estado == "Completado":
+            self._notify(user_id, f"🏆 ¡Proyecto Completado! Has finalizado el proyecto: {proj.nombre}")
             self.add_exp(user_id, 500, "Proyecto completado")
         
         return res
@@ -147,8 +148,8 @@ class TsukuyomiUseCases:
         task.estado = nuevo_estado
         res = self.repository.update_task(task, user_id)
         
-        if self.notifier and nuevo_estado == "Completada":
-            self.notifier.send_notification(f"🎯 Tarea Completada: {task.titulo}")
+        if nuevo_estado == "Completada":
+            self._notify(user_id, f"🎯 Tarea Completada: {task.titulo}")
             self.add_exp(user_id, 50, "Tarea completada")
             
         return res
@@ -165,10 +166,10 @@ class TsukuyomiUseCases:
         log = HabitLog(id=0, habit_id=habit_id, fecha=fecha, estado=estado)
         res = self.repository.log_habit(log, user_id)
         
-        if self.notifier and estado:
+        if estado:
             habits = self.repository.get_habits(user_id)
             h_nombre = next((h.nombre for h in habits if h.id == habit_id), "Desconocido")
-            self.notifier.send_notification(f"✅ Hábito logrado: {h_nombre}")
+            self._notify(user_id, f"✅ Hábito logrado: {h_nombre}")
             self.add_exp(user_id, 20, "Hábito completado")
             
         return res
@@ -183,10 +184,7 @@ class TsukuyomiUseCases:
     def add_reflection(self, user_id: int, tipo: str, fecha: str, respuestas: dict) -> Reflection:
         reflection = Reflection(id=0, tipo=tipo, fecha=fecha, respuestas=respuestas)
         res = self.repository.add_reflection(reflection, user_id)
-        
-        if self.notifier:
-            self.notifier.send_notification(f"🧘‍♂️ Reflexión {tipo} guardada para el {fecha}. ¡Sigue mejorando (Kaizen)!")
-            
+        self._notify(user_id, f"🧘‍♂️ Reflexión {tipo} guardada para el {fecha}. ¡Sigue mejorando (Kaizen)!")
         return res
 
     def get_reflections(self, user_id: int, tipo: str = None) -> List[Reflection]:
@@ -198,10 +196,8 @@ class TsukuyomiUseCases:
         
     def restore_item(self, table_name: str, item_id: int, user_id: int) -> None:
         self.repository.restore_item(table_name, item_id, user_id)
-        if self.notifier:
-            self.notifier.send_notification(f"♻️ Objeto restaurado en la tabla {table_name} (ID: {item_id}).")
+        self._notify(user_id, f"♻️ Objeto restaurado en la tabla {table_name} (ID: {item_id}).")
             
     def hard_delete_item(self, table_name: str, item_id: int, user_id: int) -> None:
         self.repository.hard_delete_item(table_name, item_id, user_id)
-        if self.notifier:
-            self.notifier.send_notification(f"🔥 Objeto purgado permanentemente de la tabla {table_name} (ID: {item_id}).")
+        self._notify(user_id, f"🔥 Objeto purgado permanentemente de la tabla {table_name} (ID: {item_id}).")

@@ -32,6 +32,22 @@ class SupabaseRepository(TsukuyomiRepository):
             return res.data[0]['id']
         return None
 
+    def update_telegram_chat_id(self, user_id: int, chat_id: str) -> bool:
+        res = self.supabase.table("usuarios").update({"telegram_chat_id": chat_id}).eq("id", user_id).execute()
+        return hasattr(res, 'data') and len(res.data) > 0
+
+    def get_user_id_by_telegram_chat_id(self, chat_id: str) -> Optional[int]:
+        res = self.supabase.table("usuarios").select("id").eq("telegram_chat_id", str(chat_id)).execute()
+        if hasattr(res, 'data') and len(res.data) > 0:
+            return res.data[0]['id']
+        return None
+
+    def get_telegram_chat_id(self, user_id: int) -> Optional[str]:
+        res = self.supabase.table("usuarios").select("telegram_chat_id").eq("id", user_id).execute()
+        if hasattr(res, 'data') and len(res.data) > 0:
+            return res.data[0].get('telegram_chat_id')
+        return None
+
     # --- CRUD OPERATIONS ---
 
     def add_activity(self, activity: Activity, user_id: int) -> Activity:

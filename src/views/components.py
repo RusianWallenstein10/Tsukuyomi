@@ -1101,4 +1101,22 @@ def main_app_view(use_cases):
             st.session_state.bg_image = None
             use_cases.repository.save_config("background_image", "", st.session_state.user_id)
             st.rerun()
+            
+    # --- Telegram Bot Config Logic ---
+    st.sidebar.markdown("---")
+    st.sidebar.markdown("### 🤖 Mi Perfil / Bot")
+    current_chat_id = use_cases.repository.get_telegram_chat_id(st.session_state.user_id)
+    with st.sidebar.expander("Configurar Bot de Telegram"):
+        st.caption("Recibe notificaciones y crea tareas desde Telegram.")
+        st.markdown("1. Escribe a **@idbot** en Telegram y pide tu ID.")
+        st.markdown("2. Inicia un chat con **@CielSenseiBot**.")
+        new_chat_id = st.text_input("Tu Telegram Chat ID", value=current_chat_id if current_chat_id else "")
+        if st.button("Vincular", use_container_width=True):
+            if new_chat_id:
+                success = use_cases.repository.update_telegram_chat_id(st.session_state.user_id, new_chat_id.strip())
+                if success:
+                    st.success("✅ ¡Telegram vinculado!")
+                    st.rerun()
+            else:
+                st.warning("⚠️ Ingresa un ID válido.")
 

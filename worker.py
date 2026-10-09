@@ -29,27 +29,19 @@ def main():
     supabase_url = os.environ.get("SUPABASE_URL", "")
     supabase_key = os.environ.get("SUPABASE_KEY", "")
     bot_token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
     
-    if not all([supabase_url, supabase_key, bot_token, chat_id]):
+    if not all([supabase_url, supabase_key, bot_token]):
         print("❌ Error: Faltan variables de entorno (.env).")
         return
         
     repo = SupabaseRepository(supabase_url, supabase_key)
-    notifier = TelegramNotificationService(bot_token, chat_id)
-    
-    # Obtener el ID del usuario principal (asumimos que es personal y es el primer usuario)
-    res_users = repo.supabase.table("usuarios").select("id").limit(1).execute()
-    if not hasattr(res_users, 'data') or not res_users.data:
-        print("❌ Error: No hay usuarios registrados en el sistema. Regístrate primero.")
-        return
-    master_user_id = res_users.data[0]["id"]
+    notifier = TelegramNotificationService(bot_token)
     
     notified_events = set()
     last_update_id = None
     last_schedule_check = 0
     
-    print("✅ Worker conectado a Supabase y Telegram. Escuchando comandos...")
+    print("✅ Worker conectado a Supabase y Telegram. Escuchando comandos (Multi-Usuario)...")
     
     while True:
         try:
@@ -60,14 +52,20 @@ def main():
                     last_update_id = update["update_id"] + 1
                     message = update.get("message", {})
                     text = message.get("text", "")
+                    chat_id_in = str(message.get("chat", {}).get("id", ""))
                     
                     if text.startswith("/tarea "):
                         task_title = text.replace("/tarea ", "").strip()
-                        if task_title:
-                            new_task = Task(id=0, titulo=task_title, project_id=None, estado="Pendiente")
-                            repo.add_task(new_task, master_user_id)
-                            notifier.send_notification(f"✅ Tarea añadida al Kanban: {task_title}")
-                            print(f"📥 Tarea recibida por Telegram: {task_title}", flush=True)
+                        if task_title and chat_id_in:
+                            # Buscar usuario dueño de este chat_id
+                            user_id = repo.get_user_id_by_telegram_chat_id(chat_id_in)
+                            if user_id:
+                                new_task = Task(id=0, titulo=task_title, project_id=None, estado="Pendiente")
+                                repo.add_task(new_task, user_id)
+                                notifier.send_notification(f"✅ Tarea añadida al Kanban: {task_title}", chat_id_in)
+                                print(f"📥 Tarea de usuario {user_id}: {task_title}", flush=True)
+                            else:
+                                notifier.send_notification("❌ No estás registrado. Ve a Tsukuyomi Web > Mi Perfil y vincula este número de ID de Telegram.", chat_id_in)
             
             # 2. REVISAR HORARIOS (CADA 60 SEG)
             current_time = time.time()
@@ -77,11 +75,16 @@ def main():
                 activities = res.data if hasattr(res, 'data') else []
                 now = datetime.now()
                 
+                # Cache user chat_ids so we don't query the DB 100 times if not needed
+                user_chats = {}
+                
                 for act in activities:
                     try:
                         fase_str = act.get('fase', '')
                         inicio_str = act.get('inicio', '')
-                        if not fase_str or not inicio_str:
+                        act_user_id = act.get('user_id')
+                        
+                        if not fase_str or not inicio_str or not act_user_id:
                             continue
                             
                         if len(inicio_str.split(':')) == 3:
@@ -92,6 +95,14 @@ def main():
                     except Exception:
                         continue
                     
+                    # Fetch user chat ID
+                    if act_user_id not in user_chats:
+                        user_chats[act_user_id] = repo.get_telegram_chat_id(act_user_id)
+                    
+                    user_chat_id = user_chats[act_user_id]
+                    if not user_chat_id:
+                        continue # El usuario no ha vinculado Telegram
+                    
                     time_diff = act_dt - now
                     minutes_left = time_diff.total_seconds() / 60.0
                     
@@ -99,11 +110,11 @@ def main():
                     id_20min = f"{act['id']}_{now.date()}_20min"
                     
                     if 19.0 <= minutes_left <= 21.0 and id_20min not in notified_events:
-                        notifier.send_notification(f"⏳ Recordatorio: En 20 minutos empieza '{act['actividad']}'.")
+                        notifier.send_notification(f"⏳ Recordatorio: En 20 minutos empieza '{act['actividad']}'.", user_chat_id)
                         notified_events.add(id_20min)
                         
                     if -1.0 <= minutes_left <= 1.0 and id_exact not in notified_events:
-                        notifier.send_notification(f"🚀 ¡Es hora! Comenzando: '{act['actividad']}'.")
+                        notifier.send_notification(f"🚀 ¡Es hora! Comenzando: '{act['actividad']}'.", user_chat_id)
                         notified_events.add(id_exact)
                         
         except Exception as e:

@@ -17,8 +17,7 @@ def get_use_cases():
     repo = SupabaseRepository(supabase_url, supabase_key)
     
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "")
-    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "")
-    notifier = TelegramNotificationService(token, chat_id) if token and chat_id else None
+    notifier = TelegramNotificationService(token) if token else None
     
     return TsukuyomiUseCases(repo, notifier)
 

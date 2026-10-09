@@ -13,6 +13,10 @@ class TsukuyomiRepository(ABC):
         pass
 
     @abstractmethod
+    def get_telegram_chat_id(self, user_id: int) -> Optional[str]:
+        pass
+
+    @abstractmethod
     def add_activity(self, activity: Activity, user_id: int) -> Activity:
         pass
 
@@ -73,5 +77,5 @@ class TsukuyomiRepository(ABC):
 
 class NotificationService(ABC):
     @abstractmethod
-    def send_notification(self, message: str) -> None:
+    def send_notification(self, message: str, chat_id: str = None) -> None:
         pass
