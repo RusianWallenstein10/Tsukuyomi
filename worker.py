@@ -54,18 +54,58 @@ def main():
                     text = message.get("text", "")
                     chat_id_in = str(message.get("chat", {}).get("id", ""))
                     
+                    if not text or not chat_id_in:
+                        continue
+                        
+                    user_id = repo.get_user_id_by_telegram_chat_id(chat_id_in)
+                    if not user_id:
+                        notifier.send_notification("❌ No estás registrado. Ve a Tsukuyomi Web > Mi Perfil y vincula este número de ID de Telegram.", chat_id_in)
+                        continue
+
                     if text.startswith("/tarea "):
                         task_title = text.replace("/tarea ", "").strip()
-                        if task_title and chat_id_in:
-                            # Buscar usuario dueño de este chat_id
-                            user_id = repo.get_user_id_by_telegram_chat_id(chat_id_in)
-                            if user_id:
-                                new_task = Task(id=0, titulo=task_title, project_id=None, estado="Pendiente")
-                                repo.add_task(new_task, user_id)
-                                notifier.send_notification(f"✅ Tarea añadida al Kanban: {task_title}", chat_id_in)
-                                print(f"📥 Tarea de usuario {user_id}: {task_title}", flush=True)
+                        if task_title:
+                            new_task = Task(id=0, titulo=task_title, project_id=None, estado="Pendiente")
+                            repo.add_task(new_task, user_id)
+                            notifier.send_notification(f"✅ Tarea añadida al Kanban: {task_title}", chat_id_in)
+                            print(f"📥 Tarea de usuario {user_id}: {task_title}", flush=True)
+
+                    elif text.startswith("/habito "):
+                        habit_name = text.replace("/habito ", "").strip()
+                        if habit_name:
+                            habits = repo.get_habits(user_id)
+                            target_h = next((h for h in habits if h.nombre.lower() == habit_name.lower()), None)
+                            if target_h:
+                                from src.models.entities import HabitLog
+                                today_str = datetime.now().date().isoformat()
+                                log = HabitLog(id=0, habit_id=target_h.id, fecha=today_str, estado=True)
+                                repo.log_habit(log, user_id)
+                                notifier.send_notification(f"🔥 ¡Hábito marcado como completado hoy!: {target_h.nombre}", chat_id_in)
                             else:
-                                notifier.send_notification("❌ No estás registrado. Ve a Tsukuyomi Web > Mi Perfil y vincula este número de ID de Telegram.", chat_id_in)
+                                notifier.send_notification(f"⚠️ No encontré el hábito '{habit_name}'. Escribe el nombre tal como está en la web.", chat_id_in)
+                                
+                    elif text.strip() == "/agenda":
+                        DAYS_ES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+                        today_str = DAYS_ES[datetime.now().weekday()]
+                        acts = repo.get_activities(user_id)
+                        today_acts = sorted([a for a in acts if a.fase == today_str], key=lambda x: x.inicio)
+                        if today_acts:
+                            msg = f"📅 Tu agenda para hoy ({today_str}):\n"
+                            for a in today_acts:
+                                msg += f"• {a.inicio}: {a.actividad}\n"
+                            notifier.send_notification(msg, chat_id_in)
+                        else:
+                            notifier.send_notification(f"📅 Hoy ({today_str}) tienes el día libre. No hay actividades programadas.", chat_id_in)
+                            
+                    elif text.strip() in ["/help", "/start", "/comandos"]:
+                        help_msg = (
+                            "🤖 **Comandos de Ciel (Tsukuyomi)**\n\n"
+                            "📝 `/tarea [nombre]` - Envía una tarea a tu Inbox (Kanban).\n"
+                            "🔥 `/habito [nombre]` - Marca un hábito como completado hoy.\n"
+                            "📅 `/agenda` - Resumen de tu horario para hoy.\n"
+                            "🆘 `/comandos` (o `/help`) - Muestra esta lista de comandos."
+                        )
+                        notifier.send_notification(help_msg, chat_id_in)
             
             # 2. REVISAR HORARIOS (CADA 60 SEG)
             current_time = time.time()
@@ -78,6 +118,8 @@ def main():
                 # Cache user chat_ids so we don't query the DB 100 times if not needed
                 user_chats = {}
                 
+                DAYS_ES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+                
                 for act in activities:
                     try:
                         fase_str = act.get('fase', '')
@@ -85,6 +127,11 @@ def main():
                         act_user_id = act.get('user_id')
                         
                         if not fase_str or not inicio_str or not act_user_id:
+                            continue
+                            
+                        # Verificar que el día de hoy coincida con la 'fase' de la actividad
+                        today_str = DAYS_ES[now.weekday()]
+                        if fase_str != today_str:
                             continue
                             
                         if len(inicio_str.split(':')) == 3:

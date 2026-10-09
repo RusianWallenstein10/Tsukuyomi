@@ -517,6 +517,18 @@ def view_kanban(use_cases):
                                 except ValueError as e:
                                     st.error(str(e))
                                     
+            # Tareas Sueltas (Inbox / Telegram)
+            orphan_tasks = [t for t in tasks if t.project_id is None and t.estado == est]
+            if orphan_tasks:
+                with st.container(border=True):
+                    st.markdown("**📥 Bandeja de Entrada**")
+                    for t in orphan_tasks:
+                        nuevo_est = st.checkbox(t.titulo, value=(t.estado=="Completada"), key=f"ot_{t.id}")
+                        estado_esperado = "Completada" if nuevo_est else "Pendiente"
+                        if estado_esperado != t.estado:
+                            use_cases.update_task_status(t.id, st.session_state.user_id, estado_esperado)
+                            st.rerun()
+                                    
             st.markdown('</div>', unsafe_allow_html=True)
 
 
