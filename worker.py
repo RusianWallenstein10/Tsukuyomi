@@ -64,10 +64,10 @@ def main():
                     if text.startswith("/tarea "):
                         task_title = text.replace("/tarea ", "").strip()
                         if task_title:
-                            new_task = Task(id=0, titulo=task_title, estado="Pendiente")
+                            new_task = Task(id=0, titulo=task_title, project_id=None, estado="Pendiente")
                             repo.add_task(new_task, master_user_id)
                             notifier.send_notification(f"✅ Tarea añadida al Kanban: {task_title}")
-                            print(f"📥 Tarea recibida por Telegram: {task_title}")
+                            print(f"📥 Tarea recibida por Telegram: {task_title}", flush=True)
             
             # 2. REVISAR HORARIOS (CADA 60 SEG)
             current_time = time.time()
