@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import List
+from typing import List, Optional
 from src.models.entities import Activity, Area, Objective, Project, Task, Habit, HabitLog, Reflection
 
 
