@@ -9,6 +9,22 @@ class TsukuyomiUseCases:
         self.repository = repository
         self.notifier = notifier
 
+    # --- GAMIFICATION (EXP) ---
+    def add_exp(self, user_id: int, points: int, reason: str) -> dict:
+        current_exp_str = self.repository.get_config("user_exp", user_id)
+        current_exp = int(current_exp_str) if current_exp_str else 0
+        
+        old_level = (current_exp // 1000) + 1
+        new_exp = current_exp + points
+        new_level = (new_exp // 1000) + 1
+        
+        self.repository.save_config("user_exp", str(new_exp), user_id)
+        
+        if new_level > old_level and self.notifier:
+            self.notifier.send_notification(f"🌟 ¡LEVEL UP! Tu constancia ha dado frutos. Ahora eres Nivel {new_level}.")
+            
+        return {"old_level": old_level, "new_level": new_level, "exp": new_exp}
+
     # --- ACTIVITY (HORARIOS) ---
     def add_activity(
             self,
@@ -111,6 +127,7 @@ class TsukuyomiUseCases:
         
         if self.notifier and nuevo_estado == "Completado":
             self.notifier.send_notification(f"🏆 ¡Proyecto Completado! Has finalizado el proyecto: {proj.nombre}")
+            self.add_exp(user_id, 500, "Proyecto completado")
         
         return res
 
@@ -132,6 +149,7 @@ class TsukuyomiUseCases:
         
         if self.notifier and nuevo_estado == "Completada":
             self.notifier.send_notification(f"🎯 Tarea Completada: {task.titulo}")
+            self.add_exp(user_id, 50, "Tarea completada")
             
         return res
 
@@ -151,11 +169,15 @@ class TsukuyomiUseCases:
             habits = self.repository.get_habits(user_id)
             h_nombre = next((h.nombre for h in habits if h.id == habit_id), "Desconocido")
             self.notifier.send_notification(f"✅ Hábito logrado: {h_nombre}")
+            self.add_exp(user_id, 20, "Hábito completado")
             
         return res
 
     def get_habit_logs(self, user_id: int, fecha: str) -> List[HabitLog]:
         return self.repository.get_habit_logs(user_id, fecha)
+        
+    def get_all_habit_logs(self, user_id: int) -> List[HabitLog]:
+        return self.repository.get_all_habit_logs(user_id)
 
     # --- HANSEI (REFLEXIÓN) ---
     def add_reflection(self, user_id: int, tipo: str, fecha: str, respuestas: dict) -> Reflection:
@@ -169,3 +191,17 @@ class TsukuyomiUseCases:
 
     def get_reflections(self, user_id: int, tipo: str = None) -> List[Reflection]:
         return self.repository.get_reflections(user_id, tipo)
+
+    # --- SOFT DELETE / PAPELERA ---
+    def get_deleted_items(self, user_id: int) -> dict:
+        return self.repository.get_deleted_items(user_id)
+        
+    def restore_item(self, table_name: str, item_id: int, user_id: int) -> None:
+        self.repository.restore_item(table_name, item_id, user_id)
+        if self.notifier:
+            self.notifier.send_notification(f"♻️ Objeto restaurado en la tabla {table_name} (ID: {item_id}).")
+            
+    def hard_delete_item(self, table_name: str, item_id: int, user_id: int) -> None:
+        self.repository.hard_delete_item(table_name, item_id, user_id)
+        if self.notifier:
+            self.notifier.send_notification(f"🔥 Objeto purgado permanentemente de la tabla {table_name} (ID: {item_id}).")

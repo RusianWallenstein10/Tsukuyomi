@@ -40,15 +40,15 @@ def get_cached_theme_css_v9(url_or_b64):
         if luminance > 128:
             text_color = "#09090b"
             overlay = "rgba(255, 255, 255, 0.15)"
-            card_bg = "rgba(255, 255, 255, 0.15)"
-            border = "rgba(255, 255, 255, 0.4)"
+            card_bg = "rgba(255, 255, 255, 0.85)"
+            border = "rgba(255, 255, 255, 0.6)"
             accent = f"rgb({max(0,r-100)}, {max(0,g-100)}, {max(0,b-100)})"
             glow = f"rgba({max(0,r-100)}, {max(0,g-100)}, {max(0,b-100)}, 0.4)"
         else:
             text_color = "#ffffff"
             overlay = "rgba(9, 9, 11, 0.15)"
-            card_bg = "rgba(24, 24, 27, 0.20)"
-            border = "rgba(255, 255, 255, 0.10)"
+            card_bg = "rgba(24, 24, 27, 0.85)"
+            border = "rgba(255, 255, 255, 0.15)"
             accent = f"rgb({min(255,r+100)}, {min(255,g+100)}, {min(255,b+100)})"
             glow = f"rgba({min(255,r+100)}, {min(255,g+100)}, {min(255,b+100)}, 0.4)"
             
@@ -64,7 +64,14 @@ def get_cached_theme_css_v9(url_or_b64):
         }}
         
         /* Global Background */
-        body, .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"] {{
+        .stApp, [data-testid="stAppViewContainer"] {{
+            background-color: transparent !important;
+            background-image: {bg_css_val} !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-attachment: fixed !important;
+        }}
+        [data-testid="stHeader"] {{
             background-color: transparent !important;
             background-image: none !important;
         }}
@@ -90,7 +97,7 @@ def get_cached_theme_css_v9(url_or_b64):
         /* Typography */
         .stApp, .stMarkdown p, .stMarkdown span, h1, h2, h3, h4, h5, h6, label p, label span, .stMetric label {{
             color: var(--dyn-text) !important;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }}
         
         /* Sidebar Glassmorphism Fix for Newer Streamlit */
@@ -99,8 +106,8 @@ def get_cached_theme_css_v9(url_or_b64):
         }}
         [data-testid="stSidebar"] > div:first-child, [data-testid="stSidebarContent"] {{
             background-color: var(--dyn-card) !important;
-            backdrop-filter: blur(5px) !important;
-            -webkit-backdrop-filter: blur(5px) !important;
+            backdrop-filter: blur(0px) !important;
+            -webkit-backdrop-filter: blur(0px) !important;
             border-right: 1px solid var(--dyn-border) !important;
         }}
         [data-testid="stSidebarHeader"] {{
@@ -115,8 +122,8 @@ def get_cached_theme_css_v9(url_or_b64):
         [data-testid="stVerticalBlockBorderWrapper"],
         div[data-testid="stVerticalBlock"] > div[style*="border"] {{
             background: var(--dyn-card) !important;
-            backdrop-filter: blur(5px) !important;
-            -webkit-backdrop-filter: blur(5px) !important;
+            backdrop-filter: blur(0px) !important;
+            -webkit-backdrop-filter: blur(0px) !important;
             border: 1px solid var(--dyn-border) !important;
             border-radius: 12px !important;
         }}
@@ -159,12 +166,6 @@ def get_cached_theme_css_v9(url_or_b64):
         }}
         
         /* Buttons and Inputs */
-        button[kind="primary"] {{
-            background: var(--dyn-accent) !important;
-            border-color: var(--dyn-accent) !important;
-            box-shadow: 0 4px 15px var(--dyn-glow) !important;
-            color: #ffffff !important;
-        }}
         
         div[data-baseweb="input"] > div, div[data-baseweb="select"] > div, textarea, section[data-testid="stSidebar"] button[kind="secondary"] {{
             background-color: var(--dyn-card) !important;
@@ -207,8 +208,8 @@ def apply_dynamic_theme(url_or_b64):
         [data-testid="column"]:nth-of-type(2) > div,
 .activity-card, div[data-testid="stExpander"], div[data-testid="stForm"], [data-testid="stMetric"], [data-testid="stVerticalBlockBorderWrapper"], div[data-testid="stVerticalBlock"] > div[style*="border"] {
             background: var(--dyn-card) !important;
-            backdrop-filter: blur(15px) !important;
-            -webkit-backdrop-filter: blur(15px) !important;
+            backdrop-filter: blur(0px) !important;
+            -webkit-backdrop-filter: blur(0px) !important;
             border: 1px solid var(--dyn-border) !important;
             border-radius: 16px !important;
             box-shadow: 0 0 30px rgba(220, 38, 38, 0.4), inset 0 0 20px rgba(220, 38, 38, 0.1) !important;
@@ -255,12 +256,12 @@ def login_register_view(repo):
     apply_dynamic_theme(get_default_bg_b64())
     
     st.markdown("""
-        <div style='text-align: center; margin-top: 5vh; margin-bottom: 2rem;'>
-            <h1 style='font-size: 4.5rem; text-shadow: 0 0 25px rgba(220, 38, 38, 0.8), 0 0 50px rgba(220, 38, 38, 0.4); color: white; letter-spacing: 0.1em; margin-bottom: 0;'>
+        <div style='text-align: center; margin-bottom: 2rem;'>
+            <h1 style='font-size: 5.5rem; font-weight: 800; color: #ffffff !important; letter-spacing: 0.1em; margin-bottom: 0;'>
                 🩸 TSUKUYOMI
             </h1>
-            <p style='color: #d4d4d8; font-size: 1.2rem; letter-spacing: 0.4em; text-transform: uppercase; text-shadow: 0 0 10px rgba(255,255,255,0.3);'>
-                M I N D   R E A L M
+            <p style='color: #e4e4e7 !important; font-size: 1.4rem; font-weight: 700; letter-spacing: 0.6em; text-transform: uppercase;'>
+                M I N D &nbsp; R E A L M
             </p>
         </div>
     """, unsafe_allow_html=True)
@@ -268,7 +269,33 @@ def login_register_view(repo):
     col1, col2, col3 = st.columns([1, 1.5, 1])
     with col2:
         with st.container(border=True):
-            st.markdown('<div class="login-marker"></div>', unsafe_allow_html=True)
+            st.markdown("""
+                <style>
+                /* Remove Streamlit default top padding */
+                .block-container { padding-top: 2rem !important; }
+                
+                /* Enhance the login container contrast and glow */
+                div[data-testid="stVerticalBlockBorderWrapper"] {
+                    background: rgba(15, 5, 10, 0.85) !important;
+                    border: 1px solid rgba(220, 38, 38, 0.6) !important;
+                    box-shadow: 0 20px 50px rgba(0,0,0,0.9), 0 0 40px rgba(220, 38, 38, 0.3), inset 0 0 20px rgba(220, 38, 38, 0.2) !important;
+                    border-radius: 20px !important;
+                    padding: 10px !important;
+                }
+                
+                /* Fix tab colors specifically for login */
+                button[data-baseweb="tab"] {
+                    color: #e4e4e7 !important;
+                    font-size: 1.1rem !important;
+                    font-weight: 600 !important;
+                }
+                button[data-baseweb="tab"][aria-selected="true"] {
+                    color: #ef4444 !important;
+                    border-bottom: 3px solid #ef4444 !important;
+                }
+                </style>
+                <div class="login-marker"></div>
+            """, unsafe_allow_html=True)
             tab1, tab2 = st.tabs(["👁️ Despertar", "⛩️ Forjar Alma"])
             with tab1:
                 l_user = st.text_input("Usuario", key="l_user")
@@ -297,8 +324,21 @@ def login_register_view(repo):
                         st.error(f"Error: {e}")
 
 def view_dashboard(use_cases):
-    st.header("🌌 Dashboard de Alineación")
+    st.markdown("<h2 style='text-align: center;'>🌌 Dashboard de Alineación</h2>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
     
+    # 0. GAMIFICACIÓN (EXP & LEVEL)
+    exp_str = use_cases.repository.get_config("user_exp", st.session_state.user_id)
+    exp = int(exp_str) if exp_str else 0
+    level = (exp // 1000) + 1
+    exp_next = level * 1000
+    exp_current_level = exp % 1000
+    
+    with st.container(border=True):
+        st.markdown(f"<h3 style='text-align: center; margin-bottom: 0;'>✨ Nivel del Alma: {level}</h3>", unsafe_allow_html=True)
+        st.progress(exp_current_level / 1000.0, text=f"Progreso: {exp} / {exp_next} EXP para Nivel {level+1}")
+        
+    st.markdown("<br>", unsafe_allow_html=True)
     # 1. METRICA DE ALINEACIÓN
     acts = use_cases.get_all_activities(st.session_state.user_id)
     total_acts = len(acts)
@@ -328,17 +368,33 @@ def view_dashboard(use_cases):
         if not wip_projs:
             st.info("No tienes proyectos en progreso en este momento.")
         else:
+            import pandas as pd
+            import altair as alt
+            
             tasks = use_cases.get_tasks(st.session_state.user_id)
+            data = []
             for p in wip_projs:
+                p_tasks = [t for t in tasks if t.project_id == p.id]
+                completed = sum(1 for t in p_tasks if t.estado == "Completada")
+                pending = len(p_tasks) - completed
+                
+                # Agregamos data siempre y cuando haya tareas
+                if len(p_tasks) > 0:
+                    data.append({"Proyecto": p.nombre, "Tareas": completed, "Estado": "Completadas"})
+                    data.append({"Proyecto": p.nombre, "Tareas": pending, "Estado": "Pendientes"})
+                    
+            if data:
+                df = pd.DataFrame(data)
+                chart = alt.Chart(df).mark_bar().encode(
+                    y=alt.Y('Proyecto:N', title=''),
+                    x=alt.X('Tareas:Q', title='Cant. Tareas'),
+                    color=alt.Color('Estado:N', scale=alt.Scale(domain=['Completadas', 'Pendientes'], range=['#10b981', '#3f3f46']))
+                ).properties(height=200).configure_axis(grid=False).configure_view(strokeWidth=0)
+                
                 with st.container(border=True):
-                    st.markdown(f"**{p.nombre}**")
-                    p_tasks = [t for t in tasks if t.project_id == p.id]
-                    completed = sum(1 for t in p_tasks if t.estado == "Completada")
-                    total = len(p_tasks)
-                    if total > 0:
-                        st.progress(completed / total, text=f"Progreso: {completed}/{total} tareas")
-                    else:
-                        st.caption("Sin tareas")
+                    st.altair_chart(chart, use_container_width=True)
+            else:
+                st.info("Tus proyectos WIP no tienen tareas aún.")
 
     # 3. HÁBITOS DE HOY
     with col2:
@@ -445,15 +501,22 @@ def view_kanban(use_cases):
                             use_cases.add_task(st.session_state.user_id, new_t, p.id)
                             st.rerun()
 
-                    # Mover Proyecto
-                    new_est = st.selectbox("Mover a", estados, index=estados.index(p.estado), key=f"mv_{p.id}")
-                    if new_est != p.estado:
-                        try:
-                            use_cases.update_project_status(p.id, st.session_state.user_id, new_est)
-                            st.rerun()
-                        except ValueError as e:
-                            st.error(str(e))
-                            
+                    # Mover Proyecto (Botones Rápidos)
+                    col_b1, col_b2 = st.columns(2)
+                    with col_b1:
+                        if i > 0:
+                            if st.button("◀ Mover", key=f"mv_l_{p.id}", use_container_width=True):
+                                use_cases.update_project_status(p.id, st.session_state.user_id, estados[i-1])
+                                st.rerun()
+                    with col_b2:
+                        if i < len(estados) - 1:
+                            if st.button("Mover ▶", key=f"mv_r_{p.id}", use_container_width=True):
+                                try:
+                                    use_cases.update_project_status(p.id, st.session_state.user_id, estados[i+1])
+                                    st.rerun()
+                                except ValueError as e:
+                                    st.error(str(e))
+                                    
             st.markdown('</div>', unsafe_allow_html=True)
 
 
@@ -485,6 +548,49 @@ def view_habits(use_cases):
         if new_state != current_state:
             use_cases.log_habit(st.session_state.user_id, h.id, today_str, new_state)
             st.rerun()
+
+    # --- HEATMAP DE HÁBITOS ---
+    st.markdown("<br>", unsafe_allow_html=True)
+    st.subheader("🔥 Heatmap de Constancia")
+    all_logs = use_cases.get_all_habit_logs(st.session_state.user_id)
+    
+    completed_logs = [log for log in all_logs if log.estado]
+    if completed_logs:
+        import pandas as pd
+        import altair as alt
+        
+        data = []
+        for log in completed_logs:
+            habit_name = next((h.nombre for h in habits if h.id == log.habit_id), f"Hábito {log.habit_id}")
+            data.append({
+                "Fecha": log.fecha,
+                "Hábito": habit_name,
+                "Completado": 1
+            })
+            
+        df = pd.DataFrame(data)
+        
+        # Agrupamos por si hay algo duplicado (no debería por la constraint unique)
+        df = df.groupby(['Fecha', 'Hábito']).sum().reset_index()
+        
+        # Color verde esmeralda para los cuadros completados
+        heatmap = alt.Chart(df).mark_rect(rx=4, ry=4).encode(
+            x=alt.X('Fecha:O', title='', axis=alt.Axis(labelAngle=-45)),
+            y=alt.Y('Hábito:O', title=''),
+            color=alt.Color('Completado:Q', scale=alt.Scale(range=['#059669', '#10b981']), legend=None),
+            tooltip=['Fecha', 'Hábito']
+        ).properties(
+            height=max(150, len(habits) * 40)
+        ).configure_view(
+            strokeWidth=0
+        ).configure_axis(
+            grid=False
+        )
+        
+        with st.container(border=True):
+            st.altair_chart(heatmap, use_container_width=True)
+    else:
+        st.info("Marca tus hábitos como completados para ver cómo se dibuja tu historial aquí.")
 
 def view_hansei(use_cases):
     st.header("🧘‍♂️ Hansei (Reflexión)")
@@ -553,55 +659,95 @@ def view_hansei(use_cases):
 def view_calendar(use_cases):
     st.header("📅 Calendario Semanal (Time Management)")
     
+    def generate_ical(activities):
+        lines = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Tsukuyomi//ES"]
+        day_mapping = {"Lunes": "MO", "Martes": "TU", "Miércoles": "WE", "Jueves": "TH", "Viernes": "FR", "Sábado": "SA", "Domingo": "SU"}
+        date_mapping = {"Lunes": "20230102", "Martes": "20230103", "Miércoles": "20230104", "Jueves": "20230105", "Viernes": "20230106", "Sábado": "20230107", "Domingo": "20230108"}
+        for act in activities:
+            if act.fase not in day_mapping: continue
+            try:
+                inicio = act.inicio.replace(":", "")[:4] + "00"
+                fin = act.fin.replace(":", "")[:4] + "00"
+                d_code = day_mapping[act.fase]
+                b_date = date_mapping[act.fase]
+                lines.extend([
+                    "BEGIN:VEVENT",
+                    f"SUMMARY:{act.actividad}",
+                    f"DTSTART;TZID=America/Bogota:{b_date}T{inicio}",
+                    f"DTEND;TZID=America/Bogota:{b_date}T{fin}",
+                    f"RRULE:FREQ=WEEKLY;BYDAY={d_code}",
+                    f"DESCRIPTION:Categoría: {act.categoria}",
+                    "END:VEVENT"
+                ])
+            except Exception: pass
+        lines.append("END:VCALENDAR")
+        return "\n".join(lines)
+    
     with st.sidebar:
         st.header("🌑 Sincronizar Tiempo")
         tasks = [t for t in use_cases.get_tasks(st.session_state.user_id) if t.estado == "Pendiente"]
         habits = use_cases.get_habits(st.session_state.user_id)
-        with st.form("activity_form"):
-            act_nombre = st.text_input("Nombre de la Actividad")
-            tarea_vinculada = st.selectbox("Vincular Tarea (Opcional)", ["Ninguna"] + [t.titulo for t in tasks])
-            habito_vinculado = st.selectbox("Vincular Hábito (Opcional)", ["Ninguno"] + [h.nombre for h in habits])
-            categoria = st.selectbox("Categoría", list(CAT_COLORS.keys()))
-            
-            selected_days = st.multiselect("Selecciona los días", DAYS)
-            
-            horarios = {}
+        st.markdown("### Nueva Actividad")
+        act_nombre = st.text_input("Nombre de la Actividad")
+        tarea_vinculada = st.selectbox("Vincular Tarea (Opcional)", ["Ninguna"] + [t.titulo for t in tasks])
+        habito_vinculado = st.selectbox("Vincular Hábito (Opcional)", ["Ninguno"] + [h.nombre for h in habits])
+        categoria = st.selectbox("Categoría", list(CAT_COLORS.keys()))
+        
+        selected_days = st.multiselect("Selecciona los días", DAYS)
+        
+        horarios = {}
+        if selected_days:
+            st.markdown("**Horarios Personalizados**")
             for day in selected_days:
+                st.caption(f"Horario para {day}")
                 col_h1, col_h2 = st.columns(2)
                 with col_h1:
-                    inicio = st.time_input(f"Inicio ({day})")
+                    inicio = st.time_input("Inicio", key=f"inicio_{day}")
                 with col_h2:
-                    fin = st.time_input(f"Fin ({day})")
+                    fin = st.time_input("Fin", key=f"fin_{day}")
                 horarios[day] = {"inicio": inicio.strftime("%H:%M"), "fin": fin.strftime("%H:%M")}
+            
+        if st.button("Sincronizar", use_container_width=True, type="primary"):
+            if not act_nombre and tarea_vinculada == "Ninguna" and habito_vinculado == "Ninguno":
+                st.warning("Debes dar un nombre, o seleccionar una tarea, o seleccionar un hábito.")
+            elif not selected_days:
+                st.warning("Selecciona al menos un día.")
+            else:
+                t_id = next((t.id for t in tasks if t.titulo == tarea_vinculada), None)
+                h_id = next((h.id for h in habits if h.nombre == habito_vinculado), None)
                 
-            if st.form_submit_button("Sincronizar", use_container_width=True):
-                if not act_nombre and tarea_vinculada == "Ninguna" and habito_vinculado == "Ninguno":
-                    st.warning("Debes dar un nombre, o seleccionar una tarea, o seleccionar un hábito.")
-                elif not selected_days:
-                    st.warning("Selecciona al menos un día.")
-                else:
-                    t_id = next((t.id for t in tasks if t.titulo == tarea_vinculada), None)
-                    h_id = next((h.id for h in habits if h.nombre == habito_vinculado), None)
-                    
-                    nombre_final = act_nombre
-                    if not nombre_final:
-                        if tarea_vinculada != "Ninguna": nombre_final = tarea_vinculada
-                        elif habito_vinculado != "Ninguno": nombre_final = habito_vinculado
+                nombre_final = act_nombre
+                if not nombre_final:
+                    if tarea_vinculada != "Ninguna": nombre_final = tarea_vinculada
+                    elif habito_vinculado != "Ninguno": nombre_final = habito_vinculado
 
-                    for day in selected_days:
-                        use_cases.add_activity(
-                            user_id=st.session_state.user_id,
-                            actividad=nombre_final,
-                            fase=day,
-                            inicio=horarios[day]["inicio"] + ":00",
-                            fin=horarios[day]["fin"] + ":00",
-                            categoria=categoria,
-                            task_id=t_id,
-                            habit_id=h_id
-                        )
-                    st.success("Sincronizado")
-                    st.rerun()
-                    
+                for day in selected_days:
+                    use_cases.add_activity(
+                        user_id=st.session_state.user_id,
+                        actividad=nombre_final,
+                        fase=day,
+                        inicio=horarios[day]["inicio"] + ":00",
+                        fin=horarios[day]["fin"] + ":00",
+                        categoria=categoria,
+                        task_id=t_id,
+                        habit_id=h_id
+                    )
+                st.success("Sincronizado")
+                st.rerun()
+                
+        st.markdown("---")
+        st.header("📲 Exportar (iCal)")
+        all_acts = use_cases.get_all_activities(st.session_state.user_id)
+        if all_acts:
+            ical_data = generate_ical(all_acts)
+            st.download_button(
+                label="Descargar Calendario (.ics)",
+                data=ical_data,
+                file_name="tsukuyomi.ics",
+                mime="text/calendar",
+                use_container_width=True
+            )
+            st.caption("Importa este archivo en Google o Apple Calendar.")
     acts = use_cases.get_all_activities(st.session_state.user_id)
     cols = st.columns(7)
     for i, day in enumerate(DAYS):
@@ -841,15 +987,39 @@ def view_sports(use_cases):
                 use_cases.repository.save_config("workout_routines", json.dumps(data), st.session_state.user_id)
                 st.rerun()
 
+def view_trash(use_cases):
+    st.markdown("<h2 style='text-align: center;'>🗑️ Papelera (Reciclaje)</h2>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
+    
+    deleted_items = use_cases.get_deleted_items(st.session_state.user_id)
+    
+    has_items = any(len(items) > 0 for items in deleted_items.values())
+    if not has_items:
+        st.success("✨ Tu papelera está vacía.")
+        return
+        
+    for table, items in deleted_items.items():
+        if items:
+            st.markdown(f"### {table.capitalize()}")
+            for item in items:
+                with st.container(border=True):
+                    cols = st.columns([6, 1, 1])
+                    
+                    # Mostrar nombre o título dependiendo de la tabla
+                    name = item.get('titulo') or item.get('nombre') or item.get('actividad') or f"Item {item.get('id')}"
+                    cols[0].markdown(f"**{name}** (ID: {item['id']})")
+                    
+                    if cols[1].button("♻️", key=f"res_{table}_{item['id']}", help="Restaurar"):
+                        use_cases.restore_item(table, item['id'], st.session_state.user_id)
+                        st.rerun()
+                        
+                    if cols[2].button("🔥", key=f"del_{table}_{item['id']}", help="Purgar definitivamente"):
+                        use_cases.hard_delete_item(table, item['id'], st.session_state.user_id)
+                        st.rerun()
+
 def main_app_view(use_cases):
-    col1, col2 = st.columns([8, 1])
-    with col1:
-        st.title("🌙 TSUKUYOMI MASTER SYSTEM")
-    with col2:
-        st.write("")
-        if st.button("Cerrar Sesión"):
-            st.session_state.user_id = None
-            st.rerun()
+    st.markdown("<h1 style='text-align: center;'>🌙 TSUKUYOMI MASTER SYSTEM</h1>", unsafe_allow_html=True)
+    st.markdown("<br>", unsafe_allow_html=True)
 
     menu_options = {
         "📊 Dashboard (Resumen)": view_dashboard,
@@ -859,11 +1029,25 @@ def main_app_view(use_cases):
         "📝 Notas (Pizarrón)": view_notes,
         "🏋️ Deporte (Rutinas)": view_sports,
         "🧘‍♂️ Hansei (Reflexión)": view_hansei,
-        "📅 Calendario": view_calendar
+        "📅 Calendario": view_calendar,
+        "🗑️ Papelera": view_trash
     }
+    # Nivel en Sidebar
+    exp_str = use_cases.repository.get_config("user_exp", st.session_state.user_id)
+    exp = int(exp_str) if exp_str else 0
+    level = (exp // 1000) + 1
+    
+    st.sidebar.markdown(f"### 🌟 Nivel {level}")
+    st.sidebar.caption(f"✨ EXP: {exp}")
+    st.sidebar.markdown("---")
     
     st.sidebar.markdown("### Navegación")
     menu = st.sidebar.radio("Opciones", list(menu_options.keys()), label_visibility="collapsed")
+    
+    st.sidebar.markdown("<br>", unsafe_allow_html=True)
+    if st.sidebar.button("🚪 Cerrar Sesión", use_container_width=True):
+        st.session_state.user_id = None
+        st.rerun()
 
     # Ejecuta la función de vista seleccionada dinámicamente
     if menu in menu_options:

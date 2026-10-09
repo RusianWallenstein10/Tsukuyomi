@@ -60,7 +60,7 @@ class SupabaseRepository(TsukuyomiRepository):
 
     def get_activities(self, user_id: int) -> List[Activity]:
         response = self.supabase.table(self.table_name).select(
-            "*").eq("user_id", user_id).execute()
+            "*").eq("user_id", user_id).eq("is_deleted", False).execute()
         activities = []
         if hasattr(response, 'data'):
             for item in response.data:
@@ -89,7 +89,7 @@ class SupabaseRepository(TsukuyomiRepository):
         return activity
 
     def delete_activity(self, activity_id: int, user_id: int) -> None:
-        self.supabase.table(self.table_name).delete().eq(
+        self.supabase.table(self.table_name).update({"is_deleted": True}).eq(
             "id", activity_id).eq("user_id", user_id).execute()
 
     # Configuraciones (Background)
@@ -139,7 +139,7 @@ class SupabaseRepository(TsukuyomiRepository):
         return proj
 
     def get_projects(self, user_id: int) -> List[Project]:
-        res = self.supabase.table("projects").select("*").eq("user_id", user_id).execute()
+        res = self.supabase.table("projects").select("*").eq("user_id", user_id).eq("is_deleted", False).execute()
         return [Project(id=d['id'], nombre=d['nombre'], estado=d['estado'], objective_id=d.get('objective_id')) for d in res.data] if hasattr(res, 'data') else []
 
     def update_project(self, proj: Project, user_id: int) -> Project:
@@ -156,7 +156,7 @@ class SupabaseRepository(TsukuyomiRepository):
         return task
 
     def get_tasks(self, user_id: int) -> List[Task]:
-        res = self.supabase.table("tasks").select("*").eq("user_id", user_id).execute()
+        res = self.supabase.table("tasks").select("*").eq("user_id", user_id).eq("is_deleted", False).execute()
         return [Task(id=d['id'], titulo=d['titulo'], estado=d['estado'], project_id=d.get('project_id')) for d in res.data] if hasattr(res, 'data') else []
 
     def update_task(self, task: Task, user_id: int) -> Task:
@@ -175,7 +175,7 @@ class SupabaseRepository(TsukuyomiRepository):
         return habit
 
     def get_habits(self, user_id: int) -> List[Habit]:
-        res = self.supabase.table("habits").select("*").eq("user_id", user_id).execute()
+        res = self.supabase.table("habits").select("*").eq("user_id", user_id).eq("is_deleted", False).execute()
         return [Habit(id=d['id'], nombre=d['nombre'], frecuencia=d['frecuencia'], objective_id=d.get('objective_id')) for d in res.data] if hasattr(res, 'data') else []
 
     def log_habit(self, habit_log: HabitLog, user_id: int) -> HabitLog:
@@ -189,6 +189,10 @@ class SupabaseRepository(TsukuyomiRepository):
 
     def get_habit_logs(self, user_id: int, fecha: str) -> List[HabitLog]:
         res = self.supabase.table("habit_logs").select("*").eq("user_id", user_id).eq("fecha", fecha).execute()
+        return [HabitLog(id=d['id'], habit_id=d['habit_id'], fecha=d['fecha'], estado=d['estado']) for d in res.data] if hasattr(res, 'data') else []
+
+    def get_all_habit_logs(self, user_id: int) -> List[HabitLog]:
+        res = self.supabase.table("habit_logs").select("*").eq("user_id", user_id).order("fecha", desc=False).execute()
         return [HabitLog(id=d['id'], habit_id=d['habit_id'], fecha=d['fecha'], estado=d['estado']) for d in res.data] if hasattr(res, 'data') else []
 
     # --- TSUKUYOMI PHASE 5 (HANSEI) ---
@@ -206,3 +210,23 @@ class SupabaseRepository(TsukuyomiRepository):
             query = query.eq("tipo", tipo)
         res = query.order("fecha", desc=True).execute()
         return [Reflection(id=d['id'], tipo=d['tipo'], fecha=d['fecha'], respuestas=d['respuestas']) for d in res.data] if hasattr(res, 'data') else []
+
+    # --- SOFT DELETE / PAPELERA ---
+    def get_deleted_items(self, user_id: int) -> dict:
+        deleted = {
+            "horarios": [],
+            "projects": [],
+            "tasks": [],
+            "habits": []
+        }
+        for table in deleted.keys():
+            res = self.supabase.table(table).select("*").eq("user_id", user_id).eq("is_deleted", True).execute()
+            if hasattr(res, 'data') and res.data:
+                deleted[table] = res.data
+        return deleted
+
+    def restore_item(self, table_name: str, item_id: int, user_id: int) -> None:
+        self.supabase.table(table_name).update({"is_deleted": False}).eq("id", item_id).eq("user_id", user_id).execute()
+
+    def hard_delete_item(self, table_name: str, item_id: int, user_id: int) -> None:
+        self.supabase.table(table_name).delete().eq("id", item_id).eq("user_id", user_id).execute()

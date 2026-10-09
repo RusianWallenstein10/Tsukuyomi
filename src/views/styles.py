@@ -11,6 +11,12 @@ def inject_styles():
         header {background-color: transparent !important;}
         
         /* Global App Style */
+        .block-container {
+            padding-top: 2rem !important;
+            padding-bottom: 1rem !important;
+            max-width: 95% !important;
+        }
+        
         .stApp { 
             background-color: #09090b; 
             background-image: 
@@ -34,16 +40,20 @@ def inject_styles():
         }
 
         h1 {
-            background: -webkit-linear-gradient(45deg, #ffffff, #a1a1aa);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #ffffff !important;
+            text-shadow: 0 4px 15px rgba(220, 38, 38, 0.6), 0 0 30px rgba(220, 38, 38, 0.3) !important;
+            background: none !important;
+            -webkit-text-fill-color: initial !important;
+            font-family: 'Outfit', sans-serif !important;
+            font-weight: 800 !important;
+            letter-spacing: -0.5px;
         }
         
         /* Glassmorphism Cards (Activity, Kanban, etc) */
         .activity-card, .kanban-column, div[data-testid="stExpander"], div[data-testid="stForm"], div[data-testid="stVerticalBlock"] > div[style*="border"] {
-            background: rgba(24, 24, 27, 0.4) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
+            background: rgba(18, 18, 20, 0.85) !important;
+            backdrop-filter: blur(0px) !important;
+            -webkit-backdrop-filter: blur(0px) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
             border-radius: 16px !important;
             padding: 15px !important;
@@ -55,9 +65,9 @@ def inject_styles():
         /* Hover effects */
         .activity-card:hover, div[data-testid="stVerticalBlock"] > div[style*="border"]:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.5) !important;
-            border-color: rgba(255, 255, 255, 0.15) !important;
-            background: rgba(24, 24, 27, 0.7) !important;
+            box-shadow: 0 12px 24px -8px rgba(0,0,0,0.7) !important;
+            border-color: rgba(255, 255, 255, 0.25) !important;
+            background: rgba(18, 18, 20, 0.95) !important;
         }
         
         /* Inputs and Buttons styling */
@@ -106,9 +116,9 @@ def inject_styles():
         
         /* Sidebar styling (Glassmorphism) */
         [data-testid="stSidebar"] {
-            background-color: rgba(9, 9, 11, 0.3) !important;
-            backdrop-filter: blur(12px) !important;
-            -webkit-backdrop-filter: blur(12px) !important;
+            background-color: rgba(9, 9, 11, 0.85) !important;
+            backdrop-filter: blur(0px) !important;
+            -webkit-backdrop-filter: blur(0px) !important;
             border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
         [data-testid="stSidebarHeader"] {
